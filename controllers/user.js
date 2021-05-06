@@ -127,7 +127,7 @@ export const forgot = async (req, res) => {
       ...mailOptions,
       to: result.email,
       text: `Please click the following link to reset the password. If the request is not sent by you please ignore it.
-  http://localhost:3000/reset/${token}
+  https://redbird.netlify.app/reset/${token}
 
 
 
