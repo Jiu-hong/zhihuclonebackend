@@ -34,6 +34,9 @@ app.use("/comment", commentroute);
 app.use("/topics", topicroute);
 app.use("/auth", auth);
 app.use("/search", searchroute);
+app.get("/", (req, res) => {
+  res.send("Welcome from zhihuclone backend!");
+});
 
 mongoose
   .connect(process.env.DB_HOST_PROD, {
