@@ -15,6 +15,7 @@ const { Schema } = mongoose;
 // }
 const QuestionSchema = mongoose.Schema({
   content: String,
+  content_lower: String,
   topic: [{ type: Schema.Types.ObjectId, ref: "Topic" }],
   follow: [String],
   anonymous: { type: Boolean, default: false },

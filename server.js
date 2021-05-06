@@ -9,8 +9,10 @@ import helmet from "helmet";
 import questionroute from "./routes/questionroute.js";
 import answerroute from "./routes/answerroute.js";
 import userroute from "./routes/userroute.js";
+import personroute from "./routes/personroute.js";
 import commentroute from "./routes/commentroute.js";
 import topicroute from "./routes/topicroute.js";
+import searchroute from "./routes/searchroute.js";
 import { auth } from "./middleware/auth.js";
 
 const app = express();
@@ -27,9 +29,11 @@ app.use(cors());
 app.use("/question", questionroute);
 app.use("/answer", answerroute);
 app.use("/user", userroute);
+app.use("/person", personroute);
 app.use("/comment", commentroute);
 app.use("/topics", topicroute);
 app.use("/auth", auth);
+app.use("/search", searchroute);
 
 mongoose
   .connect(process.env.DB_HOST_PROD, {

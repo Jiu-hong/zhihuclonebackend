@@ -23,20 +23,6 @@ export const getCertainComments = async (req, res) => {
   }
 };
 
-// route.post("/postids", getCertainCommentsbyPostids);
-export const getCommentsbyPostids = async (req, res) => {
-  const { postids } = req.body;
-  try {
-    const result = await Comment.find({
-      postid: { $in: postids },
-    }).populate("creator", ["name", "description"]);
-
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
 //route.post("/:parent_id/", createComment);
 //http://localhost:5005/comment/:parent_id
 //input:
@@ -56,6 +42,7 @@ export const createComment = async (req, res) => {
       postid,
       parentid,
       content,
+      content_lower: content.toLowerCase(),
       like,
       creator: req.userid,
       update_date: Date.now(),
@@ -65,6 +52,7 @@ export const createComment = async (req, res) => {
       postid,
       //no parentid
       content,
+      content_lower: content.toLowerCase(),
       like,
       creator: req.userid,
       update_date: Date.now(),

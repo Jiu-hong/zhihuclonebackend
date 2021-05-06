@@ -14,6 +14,7 @@ const AnswerScheme = new Schema({
   // question_id:
   question: { type: Schema.Types.ObjectId, ref: "Question", required: true },
   content: String,
+  content_lower: String,
   topic: [{ type: Schema.Types.ObjectId, ref: "Topic" }],
   like: [String],
   anonymous: { type: Boolean, default: false },

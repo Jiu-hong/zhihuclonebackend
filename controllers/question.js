@@ -14,61 +14,123 @@ export const getQuestions = async (req, res) => {
   }
 };
 
+// export const getCertainQuestion = async (req, res) => {
+//   const { questionid } = req.params;
+
+//   try {
+//     const result = await Question.findById(questionid)
+//       .populate("topic")
+//       .populate("creator", ["name", "description"]);
+
+//     res.status(200).json(result);
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
+
 export const getCertainQuestion = async (req, res) => {
   const { questionid } = req.params;
 
-  try {
-    const result = await Question.findById(questionid)
-      .populate("topic")
-      .populate("creator", ["name", "description"]);
+  const question = await Question.findById(questionid)
+    .populate("topic")
+    .populate("creator", ["name", "description"]);
 
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+  // const answers = (await getcertainanswers(questionid)).data;
+
+  const answers = await Answer.find({ question: questionid })
+    .populate("topic")
+    .populate({
+      path: "creator",
+      model: "User",
+      select: ["name", "description"],
+      populate: {
+        path: "followers",
+        model: "User",
+        select: ["name", "description"],
+      },
+    })
+    .populate("question");
+
+  let personids = answers.map((answer) => answer.creator._id);
+
+  personids.push(question.creator._id);
+  const uniquepersonids = [...new Set(personids)];
+
+  // const persons = await User.find({ _id: { $in: uniquepersonids } })
+  const persons = await User.find({ _id: uniquepersonids })
+    .select("-password")
+    .populate({
+      path: "myquestions",
+      model: "Question",
+      populate: {
+        path: "creator",
+        model: "User",
+        select: ["email", "description", "name"],
+      },
+    })
+    .populate({
+      path: "myanswers",
+      model: "Answer",
+      populate: [
+        {
+          path: "creator",
+          select: ["email", "description", "name"],
+          model: "User",
+        },
+        {
+          path: "question",
+          model: "Question",
+        },
+      ],
+    })
+    .populate({
+      path: "followquestions",
+      model: "Question",
+      populate: {
+        path: "creator",
+        model: "User",
+        select: ["email", "description", "name"],
+      },
+    })
+    .populate({
+      path: "likeanswers",
+      model: "Answer",
+      populate: [
+        {
+          path: "creator",
+          select: ["email", "description", "name"],
+          model: "User",
+        },
+        {
+          path: "question",
+          model: "Question",
+        },
+      ],
+    })
+    // .populate("followers")
+    .populate({
+      path: "followers",
+      model: "User",
+      select: ["name", "description"],
+    })
+    // .populate("followings");
+    .populate({
+      path: "followings",
+      model: "User",
+      select: ["name", "description"],
+    });
+
+  const qandasids = answers.map((answer) => answer._id);
+  qandasids.push(questionid);
+
+  const comments = await Comment.find({ postid: qandasids }).populate(
+    "creator",
+    ["name", "description"]
+  );
+
+  res.status(200).json({ question, answers, persons, comments });
 };
 
-export const getQuestionsbyCreator = async (req, res) => {
-  const { creator } = req.params;
-
-  try {
-    const result = await Question.find({ creator: creator })
-      .populate("topic")
-      .populate("creator", ["name", "description"]);
-
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-export const getQuestionsbyFollow = async (req, res) => {
-  const { followid } = req.params;
-
-  try {
-    const result = await Question.find({ follow: followid })
-      .populate("topic")
-      .populate("creator", ["name", "description"]);
-
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-export const getQuestionsbyTopic = async (req, res) => {
-  const { topicid } = req.params;
-
-  try {
-    const result = await Question.find({ topic: topicid })
-      .populate("topic")
-      .populate("creator", ["name", "description"]);
-
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
 // export const createQuestionAnonymous = async (req, res) => {
 //   const body = req.body;
 //   const userid = req.userid;
@@ -103,6 +165,7 @@ export const createQuestion = async (req, res) => {
   try {
     const newQuestion = new Question({
       ...body,
+      content_lower: body.content.toLowerCase(),
       creator: userid,
       update_date: Date.now(),
     });

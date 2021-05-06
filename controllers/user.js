@@ -1,4 +1,8 @@
 import User from "../models/User.js";
+import Answer from "../models/Answer.js";
+import Question from "../models/Question.js";
+import Comment from "../models/Comment.js";
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
@@ -64,6 +68,7 @@ export const signup = async (req, res) => {
     email,
     password: hashedPassword,
     name: `${firstname} ${lastname}`,
+    name_lower: `${firstname} ${lastname}`.toLowerCase(),
     description,
   });
 
@@ -187,181 +192,8 @@ export const reset = async (req, res) => {
 
   res.status(200).json({ result: userWithoutPwd, token });
 };
-export const getuserinfo = async (req, res) => {
-  const { userid } = req.body;
 
-  const user = await User.findById(userid)
-    .select("-password")
-    .populate({
-      path: "myquestions",
-      model: "Question",
-      populate: {
-        path: "creator",
-        model: "User",
-        select: ["email", "description", "name"],
-      },
-    })
-    .populate({
-      path: "myanswers",
-      model: "Answer",
-      populate: [
-        {
-          path: "creator",
-          select: ["email", "description", "name"],
-          model: "User",
-        },
-        {
-          path: "question",
-          model: "Question",
-        },
-      ],
-    })
-    .populate({
-      path: "followquestions",
-      model: "Question",
-      populate: {
-        path: "creator",
-        model: "User",
-        select: ["email", "description", "name"],
-      },
-    })
-    .populate({
-      path: "likeanswers",
-      model: "Answer",
-      populate: [
-        {
-          path: "creator",
-          select: ["email", "description", "name"],
-          model: "User",
-        },
-        {
-          path: "question",
-          model: "Question",
-        },
-      ],
-    })
-    .populate("followers")
-    .populate("followings");
-
-  res.status(200).json(user);
-};
-
-export const getusers = async (req, res) => {
-  const result = await User.find()
-    .select("-password")
-    .populate({
-      path: "myquestions",
-      model: "Question",
-      populate: {
-        path: "creator",
-        model: "User",
-        select: ["email", "description", "name"],
-      },
-    })
-    .populate({
-      path: "myanswers",
-      model: "Answer",
-      populate: [
-        {
-          path: "creator",
-          select: ["email", "description", "name"],
-          model: "User",
-        },
-        {
-          path: "question",
-          model: "Question",
-        },
-      ],
-    })
-    .populate({
-      path: "followquestions",
-      model: "Question",
-      populate: {
-        path: "creator",
-        model: "User",
-        select: ["email", "description", "name"],
-      },
-    })
-    .populate({
-      path: "likeanswers",
-      model: "Answer",
-      populate: [
-        {
-          path: "creator",
-          select: ["email", "description", "name"],
-          model: "User",
-        },
-        {
-          path: "question",
-          model: "Question",
-        },
-      ],
-    })
-    .populate("followers")
-    .populate("followings");
-
-  res.status(200).json(result);
-};
-
-export const getusersbyids = async (req, res) => {
-  const { ids } = req.body;
-
-  const result = await User.find({ _id: { $in: ids } })
-    .select("-password")
-    .populate({
-      path: "myquestions",
-      model: "Question",
-      populate: {
-        path: "creator",
-        model: "User",
-        select: ["email", "description", "name"],
-      },
-    })
-    .populate({
-      path: "myanswers",
-      model: "Answer",
-      populate: [
-        {
-          path: "creator",
-          select: ["email", "description", "name"],
-          model: "User",
-        },
-        {
-          path: "question",
-          model: "Question",
-        },
-      ],
-    })
-    .populate({
-      path: "followquestions",
-      model: "Question",
-      populate: {
-        path: "creator",
-        model: "User",
-        select: ["email", "description", "name"],
-      },
-    })
-    .populate({
-      path: "likeanswers",
-      model: "Answer",
-      populate: [
-        {
-          path: "creator",
-          select: ["email", "description", "name"],
-          model: "User",
-        },
-        {
-          path: "question",
-          model: "Question",
-        },
-      ],
-    })
-    .populate("followers")
-    .populate("followings");
-
-  res.status(200).json(result);
-};
-export const followuser = async (req, res) => {
+export const followperson = async (req, res) => {
   try {
     const userid = req.userid;
     const { followid } = req.body;
@@ -466,27 +298,3 @@ export const deleteUser = async (req, res) => {
 };
 
 //*********for my test *******/
-
-export const clearuserinfo = async (req, res) => {
-  const id = req.userid;
-  // try {
-  const user = await User.findByIdAndUpdate(
-    id,
-    {
-      myquestions: [],
-      myanswers: [],
-      followquestions: [],
-      likeanswers: [],
-      followers: [],
-      followings: [],
-    },
-    {
-      returnOriginal: false,
-    }
-  );
-
-  res.status(200).json(user);
-  // } catch (error) {
-  //   res.status(400).json({ error: error.message });
-  // }
-};

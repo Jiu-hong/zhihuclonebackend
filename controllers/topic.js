@@ -34,7 +34,8 @@ export const createTopic = async (req, res) => {
   try {
     const body = req.body;
 
-    const topic = new Topic(body);
+    const topic = new Topic({ ...body, name_lower: body.name.toLowerCase() });
+
     const result = await topic.save();
 
     res.status(200).json(result);

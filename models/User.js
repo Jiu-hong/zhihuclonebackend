@@ -10,6 +10,7 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   name: String,
+  name_lower: String,
   description: String,
   email: String,
   password: String,

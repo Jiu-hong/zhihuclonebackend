@@ -22,7 +22,7 @@ route.get("/creator/:creator", getAnswersbyCreator);
 
 route.get("/answersbylike/:likeid", getAnswersbyLike);
 
-route.get("/answersbytopic/:topicid", getAnswersbyTopic);
+route.get("/qasbytopic/:topicid", getAnswersbyTopic);
 
 route.get("/answer/:answerid", getAnswer); //??still needed
 
