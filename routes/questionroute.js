@@ -3,7 +3,6 @@ import { auth } from "../middleware/auth.js";
 import {
   getQuestions,
   getCertainQuestion,
-  // createQuestionAnonymous,
   createQuestion,
   updateQuestion,
   deleteQuestion,
@@ -17,8 +16,6 @@ route.get("/", getQuestions);
 route.get("/:questionid", getCertainQuestion);
 
 route.post("/", auth, createQuestion);
-
-// route.post("/anonymous", auth, createQuestionAnonymous);
 
 route.patch("/:id", auth, updateQuestion);
 

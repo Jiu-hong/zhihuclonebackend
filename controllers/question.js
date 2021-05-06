@@ -14,28 +14,12 @@ export const getQuestions = async (req, res) => {
   }
 };
 
-// export const getCertainQuestion = async (req, res) => {
-//   const { questionid } = req.params;
-
-//   try {
-//     const result = await Question.findById(questionid)
-//       .populate("topic")
-//       .populate("creator", ["name", "description"]);
-
-//     res.status(200).json(result);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
-
 export const getCertainQuestion = async (req, res) => {
   const { questionid } = req.params;
 
   const question = await Question.findById(questionid)
     .populate("topic")
     .populate("creator", ["name", "description"]);
-
-  // const answers = (await getcertainanswers(questionid)).data;
 
   const answers = await Answer.find({ question: questionid })
     .populate("topic")
@@ -130,33 +114,6 @@ export const getCertainQuestion = async (req, res) => {
 
   res.status(200).json({ question, answers, persons, comments });
 };
-
-// export const createQuestionAnonymous = async (req, res) => {
-//   const body = req.body;
-//   const userid = req.userid;
-
-//   try {
-//     const newQuestion = new Question({
-//       ...body,
-//       anonymous: true,
-//       creator: userid,
-//       update_date: Date.now(),
-//     });
-
-//     const result = await (await newQuestion.save())
-//       .populate("creator", ["name", "description"])
-//       .execPopulate();
-
-//     //add to user myquestions
-//     let { myquestions } = await User.findById(userid);
-//     myquestions.push(result._id);
-//     await User.findByIdAndUpdate(userid, { myquestions });
-
-//     res.status(201).json(result);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
 
 export const createQuestion = async (req, res) => {
   const body = req.body;
